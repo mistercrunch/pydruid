@@ -176,6 +176,10 @@ class Query(collections.MutableSequence):
                 nres = []
                 for item in self.result:
                     nres += [e for e in item.get('events')]
+            elif self.query_type == "select":
+                nres = []
+                for item in self.result:
+                    nres += [e.get('event') for e in item['result'].get('events')]
             else:
                 raise NotImplementedError('Pandas export not implemented for query type: {0}'.format(self.query_type))
 
