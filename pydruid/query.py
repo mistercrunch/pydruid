@@ -172,6 +172,10 @@ class Query(collections.MutableSequence):
                 nres = [list(v['event'].items()) + [('timestamp', v['timestamp'])]
                         for v in self.result]
                 nres = [dict(v) for v in nres]
+            elif self.query_type == "scan":
+                nres = []
+                for item in self.result:
+                    nres += [e for e in item.get('events')]
             else:
                 raise NotImplementedError('Pandas export not implemented for query type: {0}'.format(self.query_type))
 
@@ -401,6 +405,23 @@ class QueryBuilder(object):
         valid_parts = [
             'datasource', 'granularity', 'filter', 'searchDimensions', 'query',
             'limit', 'intervals', 'sort'
+        ]
+        self.validate_query(query_type, valid_parts, args)
+        return self.build_query(query_type, args)
+
+    def scan(self, args):
+        """
+        A scan query returns raw Druid rows
+
+        :param dict args: dict of args
+
+        :return: select query
+        :rtype: Query
+        """
+        query_type = 'scan'
+        valid_parts = [
+            'datasource', 'granularity', 'filter', 'dimensions', 'metrics',
+            'intervals', 'limit',
         ]
         self.validate_query(query_type, valid_parts, args)
         return self.build_query(query_type, args)

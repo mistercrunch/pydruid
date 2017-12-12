@@ -410,3 +410,43 @@ class PyDruid(BaseDruidClient):
         else:
             query.parse(data)
             return query
+
+    def scan(self, **kwargs):
+        """
+        A scan query returns raw Druid rows
+
+        Required key/value pairs:
+
+        :param str datasource: Data source to query
+        :param str granularity: Time bucket to aggregate data by hour, day, minute, etc.
+        :param int limit: The maximum number of rows to return
+        :param intervals: ISO-8601 intervals for which to run the query on
+        :type intervals: str or list
+
+        Optional key/value pairs:
+
+        :param pydruid.utils.filters.Filter filter: Indicates which rows of data to include in the query
+        :param list dimensions: The list of dimensions to select. If left empty, all dimensions are returned
+        :param list metrics: The list of metrics to select. If left empty, all metrics are returned
+        :param dict context: A dict of query context options
+
+        :return: The query result
+        :rtype: Query
+
+        Example:
+
+        .. code-block:: python
+            :linenos:
+
+                >>> raw_data = client.scan(
+                        datasource=twitterstream,
+                        granularity='all',
+                        intervals='2013-06-14/pt1h',
+                        limit=1,
+                        context={"timeout": 1000}
+                    )
+                >>> print raw_data
+                >>> [{u'segmentId': u'zzzz', u'columns': [u'__time', 'status', 'region'], 'events': [{u'status': u'ok', 'region': u'SF', u'__time': 1509494400000}]}]
+        """
+        query = self.query_builder.scan(kwargs)
+        return self._post(query)
