@@ -24,7 +24,7 @@ from pydruid.utils.postaggregator import *
 from pydruid.utils import filters
 
 
-class TestPostAggregators:
+class TestPostAggregators(object):
 
     def test_anything(self):
         assert True
@@ -38,9 +38,9 @@ class TestPostAggregators:
                 (ThetaSketch('theta1') != ThetaSketch('theta2')) & ThetaSketch('theta3')),
         }
         built_agg = ThetaSketchEstimate.build_post_aggregators(pagg_input)
-        expected = [
-            {'name': 'pag1', 'type': 'thetaSketchEstimate', 'field': {'type': 'fieldAccess', 'fieldName': 'theta1'}},
-            {'name': 'pag2', 'type': 'thetaSketchEstimate', 'field':
+        expected = {
+            'pag1': {'name': 'pag1', 'type': 'thetaSketchEstimate', 'field': {'type': 'fieldAccess', 'fieldName': 'theta1'}},
+            'pag2': {'name': 'pag2', 'type': 'thetaSketchEstimate', 'field':
                 {'type': 'thetaSketchSetOp', 'func': 'INTERSECT', 'name': 'theta1_AND_theta2', 'fields':
                     [
                         {'type': 'fieldAccess', 'fieldName': 'theta1'},
@@ -48,7 +48,7 @@ class TestPostAggregators:
                     ]
                 }
              },
-            {'name': 'pag3', 'type': 'thetaSketchEstimate', 'field':
+            'pag3': {'name': 'pag3', 'type': 'thetaSketchEstimate', 'field':
                 {'type': 'thetaSketchSetOp', 'func': 'UNION', 'name': 'theta1_OR_theta2', 'fields':
                     [
                         {'type': 'fieldAccess', 'fieldName': 'theta1'},
@@ -56,7 +56,7 @@ class TestPostAggregators:
                     ]
                  }
              },
-            {'name': 'pag4', 'type': 'thetaSketchEstimate', 'field':
+            'pag4': {'name': 'pag4', 'type': 'thetaSketchEstimate', 'field':
                 {'type': 'thetaSketchSetOp', 'func': 'NOT', 'name': 'theta1_NOT_theta2', 'fields':
                     [
                         {'type': 'fieldAccess', 'fieldName': 'theta1'},
@@ -64,7 +64,7 @@ class TestPostAggregators:
                     ]
                  }
              },
-            {'name': 'pag5', 'type': 'thetaSketchEstimate', 'field':
+            'pag5': {'name': 'pag5', 'type': 'thetaSketchEstimate', 'field':
                 {'type': 'thetaSketchSetOp', 'func': 'INTERSECT', 'name': 'theta1_NOT_theta2_AND_theta3', 'fields':
                     [
                         {'type': 'thetaSketchSetOp', 'name': 'theta1_NOT_theta2', 'func': 'NOT', 'fields':
@@ -78,6 +78,9 @@ class TestPostAggregators:
                 },
              }
 
-        ]
-        assert(sorted(built_agg, key=itemgetter('name')) ==
-                sorted(expected, key=itemgetter('name')))
+        }
+        print(built_agg)
+        print(built_agg)
+        print(built_agg)
+        for obj in built_agg:
+            assert obj == expected[obj['name']]
